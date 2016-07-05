@@ -17,5 +17,3 @@ tcot_tweets.json
 .httr-oauth
 merged_evol2016.json
 *.csv
-*.png
-*.jpg
