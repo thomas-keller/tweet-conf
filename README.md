@@ -7,7 +7,7 @@ To get started you need to first register an "app" with [Twitter](https://apps.t
 
 ```R
 library(twitteR)
-library(roau
+library(ROAuth)
 cons_key=xxx
 cons_sec=xxx
 acc_tok=xxx 
