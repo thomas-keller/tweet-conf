@@ -3,6 +3,25 @@ Some simple R scripts to collect and visualize twitter happenings around a confe
 
 The script covers making a wordcloud, sentiment analysis of a conference through time, and making a network graph of the top twitter users. There's lots of room for improvement in these analyses, so let me know if there's something I should be doing better!
 
+To get started you need to first register an "app" with [Twitter](https://apps.twitter.com/). Go to that website and after logging in with your account and following the instructions you can click over to the Key and Token tab to get the tokens you need to copy in to the follow one time section (it will be saved into a file that will be used for future uses).
+
+```R
+library(twitteR)
+library(roau
+cons_key=xxx
+cons_sec=xxx
+acc_tok=xxx 
+acc_sec=xxx 
+#fill in these X's with your tokens from https://apps.twitter.com/ 
+#DO NOT WRITE THESE FOUR VALUES INTO CODE YOU POST ONTO GITHUB ETC. THEY ARE SECRET FOR A REASON!
+#keep in a local file
+#this is what I do to reduce the hassle
+load('twitter-secrets.Rdata')
+setup_twitter_oauth(cons_key,cons_sec, acc_tok, acc_sec)
+#it should ask you if you want to set up a local file to save the details for future use
+#I suggest yes
+#that's it!
+```
 
 
 
