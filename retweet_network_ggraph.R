@@ -13,9 +13,12 @@ library(stringr)
 #This is the redux parsing to generate the basic word lists per tweet
 #assuming a clean starting point separate from any of the upstream analysis
 
-hashtag<-'#smbe2016'
-tw_list <- searchTwitter(hashtag, n = 1e4, since = '2016-06-31') #~5k tweets
-tw_df<-twListToDF(tw_list)
+load('twitter-secrets.Rdata')
+setup_twitter_oauth(cons_key,cons_sec, acc_tok, acc_sec)
+
+#hashtag<-'#ISMB16'
+#tw_list <- searchTwitter(hashtag, n = 1e4, since = '2016-07-10') #~5k tweets
+#tw_df<-twListToDF(tw_list)
 
 
 
@@ -76,13 +79,14 @@ names(node_df)<-c("id","num_tweets")
 #This step #REALLLY IMPORTANT# for plotting purposes, determines how dense the network is
 #need to tune based on how big you want your input network is
 node_df2<-droplevels(node_df[1:50,]) #selecting only the top 50 posting from #evol2016 for plotting purposes
+#node_df2=node_df
 filt_rt_post<-retweeter_poster[retweeter_poster$from %in% node_df2$id & retweeter_poster$to %in% node_df2$id,]
 filt_rt_post<-droplevels(filt_rt_post) #ditch all those fleshbags that had to talk to people instead of tweeting
 head(filt_rt_post)
 
 #this creates a directed graph with vertex/node info on num_tweets, and edge info on retweets
 rt_graph<-graph_from_data_frame(d=droplevels(filt_rt_post),vertices=droplevels(node_df2),directed=T)
-
+#rt_graph=graph_from_data_frame(d=node_df,vertices=node_df,directed=T)
 #simplify the graph to remove any possible self retweets since now twitter is dumb any allows that
 #and any multiple edges
 #have to wait a couple seconds to let graph be generated before simplify call
@@ -96,10 +100,18 @@ library(ggraph)
 library(ggplot2)
 #jpeg('evol2016_top50_twitter_network.jpg',width=960,height=960,pointsize=12)
 ggraph(rt_graph,'igraph',algorithm='kk')+
-  geom_edge_fan(aes(alpha=retweet),edge_alpha=0.1)+
+  geom_edge_fan(aes(alpha=retweet),edge_alpha=0.075)+
   geom_node_point(aes(size=num_tweets))+
-  geom_node_text(aes(label=name,vjust=-1.5))+
+  geom_node_text(aes(label=name,vjust=-1.5,repel=TRUE))+
   ggforce::theme_no_axes()+
   theme(legend.position=c(.08,.88))
 filename<-paste0(substr(hashtag,2,nchar(hashtag)),'_twitter_network.png')
 ggsave(filename,width=7,height=7,dpi=100)
+
+deg.dist <-degree_distribution(rt_graph, cumulative=T, mode="all")
+deg_df<-data.frame(deg=0:max(degree(rt_graph)),cum_freq=1-deg.dist)  
+
+library(cowplot)
+qplot(deg,cum_freq,data=deg_df,xlab="Degree",ylab="Cumulative Frequency")
+filename<-paste0(substr(hashtag,2,nchar(hashtag)),'_twitter_degdist.png')
+ggsave(file=filename,width=7,height=7,dpi=100)
